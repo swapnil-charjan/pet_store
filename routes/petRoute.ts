@@ -211,14 +211,6 @@
  *         color:
  *           type: string
  *           description: The primary color of the pet
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: The creation date of the pet
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: The last update date of the pet
  *       required:
  *         - name
  *         - age
@@ -228,7 +220,6 @@
  *         - owner
  *         - color
  *       example:
- *         id: "60c72b2f9b1e8b001c8e4f3a"
  *         name: "Buddy"
  *         age: 3
  *         type: "Dog"
@@ -240,8 +231,8 @@
 
 import { Router } from "express";
 import petController from "../controllers/petController";
-import  validate from "../middleware/validate";
-import  petValidate  from "../validators/petValidator";
+import validate from "../middleware/validate";
+import petValidate from "../validators/petValidator";
 
 
 const petRouter = Router();
