@@ -7,6 +7,7 @@ import {
   getPetById,
   updatePetById,
   deletePetById,
+  getOwnerPetsById
 } from "../controllers/Pets/petController";
 import { authenticateJWT } from "../middleware/userMiddleware";
 
@@ -100,7 +101,7 @@ const petRouter = Router();
  *                     totalPages:
  *                       type: integer
  */
-petRouter.get("/pet",authenticateJWT, getAllPets);
+petRouter.get("/pet", authenticateJWT, getAllPets);
 
 /**
  * @swagger
@@ -127,7 +128,7 @@ petRouter.get("/pet",authenticateJWT, getAllPets);
  *                 pet:
  *                   $ref: '#/components/schemas/Pet'
  */
-petRouter.post("/pet",authenticateJWT, validateDto(PetDto), addPet);
+petRouter.post("/pet", authenticateJWT, validateDto(PetDto), addPet);
 
 /**
  * @swagger
@@ -152,7 +153,74 @@ petRouter.post("/pet",authenticateJWT, validateDto(PetDto), addPet);
  *       404:
  *         description: Pet not found
  */
-petRouter.get("/pet/:id",authenticateJWT, getPetById);
+petRouter.get("/pet/:id", authenticateJWT, getPetById);
+
+/**
+ * @swagger
+ * /pet/owner/{id}:
+ *   get:
+ *     summary: Get owner details by ID
+ *     description: Fetch an owner by their ID along with their pets.
+ *     tags:
+ *       - Pets
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Owner ID
+ *     responses:
+ *       200:
+ *         description: Owner details fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "clxyz12345"
+ *                 name:
+ *                   type: string
+ *                   example: "John Doe"
+ *                 email:
+ *                   type: string
+ *                   example: "john@example.com"
+ *                 pets:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "pet123"
+ *                       name:
+ *                         type: string
+ *                         example: "Buddy"
+ *                       type:
+ *                         type: string
+ *                         example: "Dog"
+ *                       age:
+ *                         type: integer
+ *                         example: 3
+ *                       breed:
+ *                         type: string
+ *                         example: "Golden Retriever"
+ *                       color:
+ *                         type: string
+ *                         example: "Golden"
+ *                       imageUrl:
+ *                         type: string
+ *                         example: "https://example.com/dog.jpg"
+ *       404:
+ *         description: Owner not found
+ *       500:
+ *         description: Server error
+ */
+petRouter.get("/pet/owner/:id", authenticateJWT, getOwnerPetsById);
 
 /**
  * @swagger
@@ -188,7 +256,7 @@ petRouter.get("/pet/:id",authenticateJWT, getPetById);
  *       404:
  *         description: Pet not found
  */
-petRouter.put("/pet/:id",authenticateJWT, validateDto(PetDto), updatePetById);
+petRouter.put("/pet/:id", authenticateJWT, validateDto(PetDto), updatePetById);
 
 /**
  * @swagger
@@ -218,7 +286,7 @@ petRouter.put("/pet/:id",authenticateJWT, validateDto(PetDto), updatePetById);
  *       404:
  *         description: Pet not found
  */
-petRouter.delete("/pet/:id",authenticateJWT, deletePetById);
+petRouter.delete("/pet/:id", authenticateJWT, deletePetById);
 
 export default petRouter;
 
@@ -245,29 +313,34 @@ export default petRouter;
  *         breed:
  *           type: string
  *           description: The breed of the pet (e.g., Labrador, Persian)
- *         image:
- *           type: string
- *           description: URL pointing to the image of the pet
- *         owner:
- *           type: string
- *           description: Name or ID of the pet owner
  *         color:
  *           type: string
  *           description: The primary color of the pet
+ *         owner:
+ *           type: string
+ *           description: Name of the pet owner
+ *         ownerId:
+ *           type: string
+ *           description: ID of the pet owner
+ *         image:
+ *           type: string
+ *           description: URL pointing to the image of the pet
  *       required:
  *         - name
  *         - age
  *         - type
  *         - breed
- *         - image
- *         - owner
  *         - color
+ *         - owner
+ *         - ownerId
+ *         - image
  *       example:
  *         name: "Buddy"
  *         age: 3
  *         type: "Dog"
  *         breed: "Golden Retriever"
- *         image: "http://example.com/images/buddy.jpg"
- *         owner: "John Doe"
  *         color: "Golden"
+ *         owner: "John Doe"
+ *         ownerId: "cmejt8mmp000053oo6pe1llss"
+ *         image: "http://example.com/images/buddy.jpg"
  */

@@ -12,15 +12,14 @@ export const authenticateJWT = (
   next: NextFunction
 ) => {
   const authHeader = req.headers.authorization;
+  const token = authHeader?.split(" ")[1];
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     return res.status(401).json({ message: "Missing or invalid token" });
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET as string);
     req.user = decoded;
     next();
   } catch (err) {

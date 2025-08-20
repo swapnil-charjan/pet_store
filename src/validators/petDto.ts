@@ -3,6 +3,7 @@ import {
   IsInt,
   Min,
   MinLength,
+  IsString,
 } from 'class-validator';
 
 export class PetDto {
@@ -21,13 +22,14 @@ export class PetDto {
   breed!: string;
 
   @IsNotEmpty()
-  @MinLength(2)
-  owner!: string;
-
-  @IsNotEmpty()
   color!: string;
 
   @IsNotEmpty()
-  image!: string;
+  imageUrl!: string; // match Prisma schema field name
+
+  @IsString()
+  @IsNotEmpty()
+  ownerId!: string; // foreign key reference to User
 }
+
 

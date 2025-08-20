@@ -12,7 +12,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /register:
+ * /user/register:
  *   post:
  *     summary: Register a new user
  *     tags: [Users]
@@ -71,11 +71,11 @@ const router = express.Router();
  *                   type: string
  *                   example: "User already exists"
  */
-router.post("/register", registerUser);
+router.post("/user/register", registerUser);
 
 /**
  * @swagger
- * /login:
+ * /user/login:
  *   post:
  *     summary: Login a user
  *     tags: [Users]
@@ -121,8 +121,7 @@ router.post("/register", registerUser);
  *                   type: string
  *                   example: "Invalid email or password"
  */
-
-router.post("/login", loginUser);
+router.post("/user/login", loginUser);
 
 /**
  * @swagger
@@ -133,14 +132,14 @@ router.post("/login", loginUser);
  *       properties:
  *         name:
  *           type: string
- *           example: "User1"
+ *           example: "User"
  *         email:
  *           type: string
  *           format: email
  *           example: "user@example.com"
  *         password:
  *           type: string
- *           example: "USER1"
+ *           example: "USER"
  *       required:
  *         - name
  *         - email

@@ -22,11 +22,6 @@ const options: swaggerJSDoc.Options = {
         },
       },
     },
-    security: [
-      {
-        bearerAuth: [], // Apply globally to all routes
-      },
-    ],
   },
   apis: ["./src/routes/*.ts"], // Path to route files with Swagger comments
 };

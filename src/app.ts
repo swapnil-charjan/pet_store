@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swaggers";
 import petRouter from "./routes/petRoute";
 import userRouter from "./routes/userRoute";
+import { errorHandler } from "./utils/errorHnadler";
 
 dotenv.config();
 
@@ -29,15 +30,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(userRouter); // User routes for registration and login
 app.use(petRouter); //if you want pets to be JWT-protected
 
-// 404 Handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
 // Global Error Handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Error:", err.message);
-  res.status(500).json({ message: "Internal Server Error" });
-});
+app.use(errorHandler);
 
 export default app;
