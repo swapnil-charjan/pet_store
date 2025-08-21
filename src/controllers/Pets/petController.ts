@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 // Assuming you attach decoded user info in req.user via authenticateJWT
 interface AuthenticatedRequest extends Request {
-  user?: { id: string; email: string };
+    user?: { id: string; email: string };
 }
 
 export const getAllPets = async (req: Request, res: Response) => {
@@ -13,7 +13,9 @@ export const getAllPets = async (req: Request, res: Response) => {
     const limit = Math.max(parseInt(req.query.limit as string) || 10, 1);
     const skip = (page - 1) * limit;
     const { name, age, type, ownerId } = req.query;
-    const filters: any = {}; // Build filters
+    const filters: any = {
+        ownerId: ownerId,
+    };
 
     if (name) {
         filters.name = {
@@ -27,8 +29,12 @@ export const getAllPets = async (req: Request, res: Response) => {
     if (ownerId) filters.ownerId = Number(ownerId);
 
     try {
+
         const total = await prisma.pet_details.count({
-            where: filters,
+            where: {
+                ...filters,
+                // ownerId: ownerId, 
+            },
         });
 
         const pets = await prisma.pet_details.findMany({
@@ -38,7 +44,6 @@ export const getAllPets = async (req: Request, res: Response) => {
             include: {
                 owner: {
                     select: {
-                        id: true,
                         name: true,
                         email: true, // Include only necessary fields
                     },
@@ -149,47 +154,47 @@ export const getOwnerPetsById = async (req: Request, res: Response) => {
 };
 
 export const updatePetById = async (req: AuthenticatedRequest, res: Response) => {
-  const petId = req.params.id;
-  const ownerId = req.user?.id; // from JWT
-  const { name, age, type, breed, color, imageUrl } = req.body; // pick only allowed fields
+    const petId = req.params.id;
+    const ownerId = req.user?.id; // from JWT
+    const { name, age, type, breed, color, imageUrl } = req.body; // pick only allowed fields
 
-  try {
-    // Check if the pet exists and belongs to the logged-in user
-    const pet = await prisma.pet_details.findUnique({
-      where: { id: petId },
-    });
+    try {
+        // Check if the pet exists and belongs to the logged-in user
+        const pet = await prisma.pet_details.findUnique({
+            where: { id: petId },
+        });
 
-    if (!pet) {
-      return res.status(404).json({ message: "Pet not found" });
+        if (!pet) {
+            return res.status(404).json({ message: "Pet not found" });
+        }
+
+        if (pet.ownerId !== ownerId) {
+            return res.status(403).json({ message: "You are not the owner of this pet" });
+        }
+
+        // Update the pet (only allowed fields)
+        const updatedPet = await prisma.pet_details.update({
+            where: { id: petId },
+            data: {
+                ...(name && { name }),
+                ...(age && { age }),
+                ...(type && { type }),
+                ...(breed && { breed }),
+                ...(color && { color }),
+                ...(imageUrl && { imageUrl }), // updatedAt is auto-handled by Prisma @updatedAt        
+            },
+        });
+
+        return res.status(200).json({
+            message: "Pet updated successfully!",
+            pet: updatedPet,
+        });
+    } catch (err: any) {
+        if (err.code === "P2025") {
+            return res.status(404).json({ message: "Pet not found" });
+        }
+        return res.status(500).json({ message: "Error updating pet" });
     }
-
-    if (pet.ownerId !== ownerId) {
-      return res.status(403).json({ message: "You are not the owner of this pet" });
-    }
-
-    // Update the pet (only allowed fields)
-    const updatedPet = await prisma.pet_details.update({
-      where: { id: petId },
-      data: {
-        ...(name && { name }),
-        ...(age && { age }),
-        ...(type && { type }),
-        ...(breed && { breed }),
-        ...(color && { color }),
-        ...(imageUrl && { imageUrl }), // updatedAt is auto-handled by Prisma @updatedAt        
-      },
-    });
-
-    return res.status(200).json({
-      message: "Pet updated successfully!",
-      pet: updatedPet,
-    });
-  } catch (err: any) {
-    if (err.code === "P2025") {
-      return res.status(404).json({ message: "Pet not found" });
-    }
-    return res.status(500).json({ message: "Error updating pet" });
-  }
 };
 
 export const deletePetById = async (req: Request, res: Response) => {

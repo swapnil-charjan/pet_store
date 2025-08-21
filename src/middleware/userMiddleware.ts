@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/jwt";
+import { Role } from "../types/roles";
 
 export interface AuthenticatedRequest extends Request {
-  user?: any;
+    user?: {
+        userId: string;
+        email: string;
+        role: Role;
+    };
 }
 
 export const authenticateJWT = (
@@ -20,7 +25,11 @@ export const authenticateJWT = (
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET as string);
-    req.user = decoded;
+    req.user = {
+      userId: (decoded as any).userId,
+      email: (decoded as any).email,
+      role: (decoded as any).role, 
+    };
     next();
   } catch (err) {
     return res.status(403).json({ message: "Token verification failed" });
